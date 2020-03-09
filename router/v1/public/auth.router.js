@@ -21,6 +21,58 @@ var smtpTransport = nodemailer.createTransport({
     }
    });
 
+   router.post('/forgetPassword', (req, res) => {
+    let password = Math.random().toString(36).slice(-8);
+    let email = req.body.email
+    console.log('############## email ##############', email)
+    authModule.forgetPassword(email, password).then(data => {
+       if (data!=null )
+           { var mailOptions = {
+            to: email,
+            subject: 'Localhost Reset Password Request',
+            //corriger username et new pass dans l'email de forgetpassword
+            html: 'Hello<strong> ' + data.username + '</strong>,<br><br>your new password : '+ password+'<br><br>'
+          };
+       
+          smtpTransport.sendMail(mailOptions, function(error, response){
+            if(error){
+                   console.log(error);
+               res.end("error");
+            }else{
+                   console.log("Message sent: " + response.message);
+               res.end("sent");
+                }
+         });
+        
+
+             
+           }
+
+
+
+         
+    }) 
+    
+    
+
+
+
+
+
+    
+})
+
+ 
+
+   router.post('/login', (req, res) => {
+    authModule.login(req.body.email, req.body.password).then((data) => {
+        response.json(res, data);
+    }).catch((err) => {
+        response.badRequest(res, err);
+    });
+});
+
+
 
 
 router.post('/register', (req, res) => {
@@ -83,8 +135,7 @@ function validate (req,res,mail,accessToken){
     
 
 
-   router.get('/activation/:token', tokenInHeaders, getUserFromToken, activateUser, (req, res) => response.accepted(res, "Account Activated"));
-
+ 
 
 
    router.get('/verify',function(req,res){

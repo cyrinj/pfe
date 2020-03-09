@@ -12,6 +12,92 @@ let env = JSON.parse(fs.readFileSync('./.secret.json'));
 Object.keys(env).forEach(key => process.env[key] = env[key]);
 
 
+module.exports.forgetPassword = (email, password) => {
+    return new Promise((resolve, reject) => {
+        User.find({ 'email': email }).then(data => {
+            let user = data[0]
+            let salt = bcrypt.genSaltSync(10);
+            let hash = bcrypt.hashSync(password, salt);
+            user.password = hash
+            User.findOneAndUpdate({ '_id': user._id }, user, { new: true }).then(dt => {
+                resolve(dt)
+            })
+        }).catch((err) => {
+            reject(err+ "l 'email inexistant") 
+
+    })
+    })
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+module.exports.login = (email, password) => {
+    return new Promise((resolve, reject) => {
+        User.find({ email: email })
+            .then(data => {
+                if (data !== null && data.length && data.length > 0) {
+                    if (bcrypt.compareSync(password, data[0].password)) {
+                        let payload = {
+                            email: data[0].email,
+                            id: data[0]._id,
+                            username:data[0].username
+                        }
+                        let token = jwt.sign(payload, process.env.JWT);
+                        console.log("token:  "+token)
+
+                        User.findByIdAndUpdate(data[0]._id, { $set: { isConnected: true, last_signIn: moment().tz("Africa/Tunisia").format() } }, { new: true }).then(user => {
+                            delete user.salt;
+                            delete user.password;
+                            console.log("RESULT: " + user);
+                            resolve({ user, token });
+                        }).catch(err => reject(err))
+
+                    } else {
+                        reject("Mot de passe erroné ");
+                    }
+                } else {
+                    reject("email n'existe pas");
+                }
+            }).catch(err => {
+                console.log('test err ', err)
+                reject(err);
+            });
+    });
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 var x
 module.exports.Activate = ( accessToken) => {
     return new Promise((resolve, reject) => {
@@ -64,7 +150,7 @@ module.exports.register  = (user) => {
                 user.password = hash;
                 user.salt = salt;
                 user.username=user.username
-                user.isConnected = true;
+                user.isConnected = false;
                 user.profilePictureUrl = profilePictureUrl;
                 user.createdAt = moment().tz("Africa/Tunisia").format();
                 user.last_signIn = moment().tz("Africa/Tunisia").format();
