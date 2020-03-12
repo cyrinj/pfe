@@ -20,6 +20,36 @@ var smtpTransport = nodemailer.createTransport({
         pass: process.env.GMAILPW
     }
    });
+ 
+   function authenticateToken(req, res, next){
+    const authHeader = req.headers['authorization']
+    const token = authHeader && authHeader.split(' ')[1]
+    if (token == null) return res.sendStatus(401)
+    jwt.verify(token,  process.env.JWT, (err, user) => {
+      console.log(err)
+      if (err) return res.sendStatus(403)
+      req.user= user
+    
+      next()
+    })
+   }
+
+
+
+
+
+
+router.post('/users', authenticateToken,  (req, res) => {
+  response.json(res,req.user)
+   })
+   
+
+
+
+
+
+
+
 
    router.post('/forgetPassword', (req, res) => {
     let password = Math.random().toString(36).slice(-8);
@@ -61,7 +91,7 @@ var smtpTransport = nodemailer.createTransport({
 
     
 })
-
+-
  
 
    router.post('/login', (req, res) => {
@@ -73,10 +103,38 @@ var smtpTransport = nodemailer.createTransport({
 });
 
 
+// logout a User By Token
+router.get('/logout', (req, res) => {
+    let header = req.headers.authorization;
+    let arr = header.split(' ');
+    if (arr[0] !== 'Bearer') {
+        response.badRequest(res, "Not a Valid Request");
+    }
+    let token = arr[1];
+    if (token) {
+        userModule.getInfoFromToken(token).then((user) => {
+            authModule.logout(user).then((result) => {
+                response.json(res, result);
+            }).catch((err) => {
+                response.badRequest(res, err);
+            });
+        }).catch((err) => {
+            response.badRequest(res, "merci de relancer votre session");
+        });
+    }
+});
+
+
+
+
+
+
+
+
 
 
 router.post('/register', (req, res) => {
-    console.log('register user router', req.body)
+    console.mlog('register user router', req.body)
 
    
     let pass = req.body.password

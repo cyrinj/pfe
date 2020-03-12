@@ -6,6 +6,26 @@ const jwt = require('jsonwebtoken');
 const userModule = require('../../../modules/user.module.js');
 const tripperModule = require('../../../modules/tripper.module.js');
 
+router.get('/submitform',    (req, res) => {
+console.log(req.body)
+tripperModule.subform ( req.body ).then((result) => {
+        
+       
+  response.json(res, result) 
+
+
+
+}).catch((err) => {
+   response.badRequest(res, err);
+}); 
+
+
+
+
+
+
+
+}) ; 
 
 var x
 function authenticateToken(req, res, next){
@@ -25,23 +45,10 @@ router.get('/profile' ,authenticateToken,  (req, res) => {
    
     tripperModule.profile(req.user ).then((result) => {
         
-        if (err) throw err;
-        // console.log(result);
-        else {
-          if (result == null ){
-            // console.log("user not found");
-           
-             res.status(201).send( {msg:"don't exist"})
-           
-            }
-            else { res.send(result) }
-        }
+       
+       response.json(res, result) 
 
-
-
-
-
-
+   
 
     }).catch((err) => {
         response.badRequest(res, err);
@@ -50,11 +57,24 @@ router.get('/profile' ,authenticateToken,  (req, res) => {
 
 })
 
+router.get('/editprofile', authenticateToken,  (req, res) => {
+
+       
+    tripperModule.editprofile(req.user ,req.body ).then((result) => {
+        
+       
+      response.json(res, result) 
+
+  
+
+   }).catch((err) => {
+       response.badRequest(res, err);
+   }); 
 
 
 
-
-
+})
+ 
 
 
 

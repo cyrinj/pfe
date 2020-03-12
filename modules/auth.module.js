@@ -12,6 +12,7 @@ let env = JSON.parse(fs.readFileSync('./.secret.json'));
 Object.keys(env).forEach(key => process.env[key] = env[key]);
 
 
+
 module.exports.forgetPassword = (email, password) => {
     return new Promise((resolve, reject) => {
         User.find({ 'email': email }).then(data => {
@@ -134,6 +135,18 @@ module.exports.Activate = ( accessToken) => {
 
 
 
+
+module.exports.logout = (user) => {
+    return new Promise((resolve, reject) => {
+        User.findByIdAndUpdate(user._id, { $set: { isConnected: false, last_signOut: moment().tz("Africa/Tunisia").format() } }, (err, us) => {
+            if (err) {
+                reject(err);
+            } else {
+                resolve("deconnecte");
+            }
+        });
+    });
+}
 
 
 
