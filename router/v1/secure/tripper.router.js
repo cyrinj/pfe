@@ -5,29 +5,7 @@ const jwt = require('jsonwebtoken');
 
 const userModule = require('../../../modules/user.module.js');
 const tripperModule = require('../../../modules/tripper.module.js');
-
-router.get('/submitform',    (req, res) => {
-console.log(req.body)
-tripperModule.subform ( req.body ).then((result) => {
-        
-       
-  response.json(res, result) 
-
-
-
-}).catch((err) => {
-   response.badRequest(res, err);
-}); 
-
-
-
-
-
-
-
-}) ; 
-
-var x
+ 
 function authenticateToken(req, res, next){
     const authHeader = req.headers['authorization']
     const token = authHeader && authHeader.split(' ')[1]
@@ -40,6 +18,105 @@ function authenticateToken(req, res, next){
       next()
     })
    }
+
+
+
+   router.post('/updatetrip',(req, res) => {
+     
+   
+    tripperModule.updatetrip(  req.body).then((result) => {
+      
+     
+      response.json(res, result) 
+
+
+    })
+      
+
+
+   })
+   
+
+
+   router.post('/annulertriproposition',(req, res) => {
+   
+    console.log(req.body.id)
+    tripperModule.annulertriproposition(req.body.id).then((result) => {
+        
+      response.json(res, result) 
+    
+    
+    
+    }).catch((err) => {
+       response.badRequest(res, err);
+    }); 
+
+
+
+      
+  })
+
+
+
+
+
+   router.post('/removetrip',(req, res) => {
+   
+
+    tripperModule. removetrip(req.body.id).then((result) => {
+        
+      response.json(res, result) 
+    
+    
+    
+    }).catch((err) => {
+       response.badRequest(res, err);
+    }); 
+
+
+
+      
+  })
+
+
+
+   router.post('/alltripsbyuser',authenticateToken,    (req, res) => {
+   
+
+    tripperModule.alltripsbyuser( req.user.id  ).then((result) => {
+        
+      response.json(res, result) 
+    
+    
+    
+    }).catch((err) => {
+       response.badRequest(res, err);
+    }); 
+
+
+
+      
+  })
+
+
+
+
+router.post('/submitform',authenticateToken,    (req, res) => {
+ 
+ var y =req.user.id
+tripperModule.subform ( req.user.id , req.body ).then((result) => {
+        
+  response.json(res, result) 
+
+
+
+}).catch((err) => {
+   response.badRequest(res, err);
+}); 
+
+
+}) ; 
+
 
 router.get('/profile' ,authenticateToken,  (req, res) => {
    
@@ -75,6 +152,25 @@ router.get('/editprofile', authenticateToken,  (req, res) => {
 
 })
  
+////////////////////////////1////////////////////////////////////////
+router.get('/getripinfo', authenticateToken,  (req, res) => {
+
+       
+  tripperModule. getripinfo(req.body.id ).then((result) => {
+      
+     
+    response.json(res, result) 
+
+
+
+ }).catch((err) => {
+     response.badRequest(res, err);
+ }); 
+
+
+
+})
+
 
 
 

@@ -25,7 +25,13 @@ var userSchema = new Schema({
     updatedAt: Date,
     linkedAccount: [],
     notification: [],
-    note: {}
+    note: {},
+    trips: [],
+    ownerTrips: [{
+        trip: Object
+    }],
+    wallet: Number,
+    history: {}
 })
 
 var User = mongoose.model('User', userSchema);

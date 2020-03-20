@@ -122,3 +122,4 @@ module.exports.getAllTripByIdBlogger = (id) => {
     }).catch(err => reject(err))
   })
 }
+

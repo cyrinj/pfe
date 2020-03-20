@@ -11,7 +11,7 @@ const authModule = require('../../../modules/auth.module.js');
 // const Mailer = require("../../../modules/utilities/email.module.js");
  
 // Register a new User
-var accessToken,mailOptions,host,link;
+var accessToken,mailOptions,host,link,mailx ;
 var smtpTransport = nodemailer.createTransport({
     service: "Gmail",
     auth: {
@@ -45,11 +45,7 @@ router.post('/users', authenticateToken,  (req, res) => {
    
 
 
-
-
-
-
-
+ 
 
    router.post('/forgetPassword', (req, res) => {
     let password = Math.random().toString(36).slice(-8);
@@ -61,21 +57,27 @@ router.post('/users', authenticateToken,  (req, res) => {
             to: email,
             subject: 'Localhost Reset Password Request',
             //corriger username et new pass dans l'email de forgetpassword
-            html: 'Hello<strong> ' + data.username + '</strong>,<br><br>your new password : '+ password+'<br><br>'
-          };
-       
+            html: 'Hello<strong> ' + data.username +  '</strong>,<br><br>You recently request a password reset link. Please click on the link below to reset your password:<br><br><a href="http://localhost:8080/#/securityquestion"> securityquestions /</a>'
+
+          }
+         
           smtpTransport.sendMail(mailOptions, function(error, response){
             if(error){
                    console.log(error);
                res.end("error");
             }else{
                    console.log("Message sent: " + response.message);
+                   mailx=email
                res.end("sent");
                 }
          });
         
+ res.json({ success: true, message: 'Please check your e-mail for password reset link' }); // Return success message
 
              
+           }
+           else {
+            res.end("error email doesn't exist");
            }
 
 
@@ -95,6 +97,7 @@ router.post('/users', authenticateToken,  (req, res) => {
  
 
    router.post('/login', (req, res) => {
+       console.log(" test 1"+ req.body.password)
     authModule.login(req.body.email, req.body.password).then((data) => {
         response.json(res, data);
     }).catch((err) => {
@@ -126,6 +129,49 @@ router.get('/logout', (req, res) => {
 
 
 
+router.post('/resetpassword',   (req, res) => {
+   
+ 
+    authModule.forgetPassword(mailx, req.body.password).then((data) => {
+
+       response.json(res, data)
+
+
+    }).catch((err) => {
+        response.badRequest(res, "erreur reset pass ");
+    });
+
+
+
+})
+
+
+
+
+
+
+
+
+router.post('/secquestion',   (req, res) => {
+ 
+    authModule.securtiyquestion(req.body).then((data) => {
+          
+       if (data==""){response.json(res,"n'existe pas")}
+       else{
+
+        response.badRequest(res, " existe");
+
+       }
+     
+
+ 
+    })
+    
+
+})
+
+
+
 
 
 
@@ -134,7 +180,7 @@ router.get('/logout', (req, res) => {
 
 
 router.post('/register', (req, res) => {
-    console.mlog('register user router', req.body)
+    console.log('register user router', req.body)
 
    
     let pass = req.body.password

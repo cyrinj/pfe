@@ -11,11 +11,32 @@ var ObjectId = require('mongodb').ObjectID;
 let env = JSON.parse(fs.readFileSync('./.secret.json'));
 Object.keys(env).forEach(key => process.env[key] = env[key]);
 
+module.exports.securtiyquestion = ( reqbody) => {
+ 
+    return new Promise((resolve, reject) => {
+       
+        User.find({email:reqbody.email , securityquestion: reqbody.securityquestion, response: reqbody.response}).then(data => {
+            resolve(data)
+          
 
+
+
+
+        }).catch((err) => {
+            console.log(err)
+            reject(err) 
+
+
+    })
+
+
+    })}
 
 module.exports.forgetPassword = (email, password) => {
     return new Promise((resolve, reject) => {
+     
         User.find({ 'email': email }).then(data => {
+            
             let user = data[0]
             let salt = bcrypt.genSaltSync(10);
             let hash = bcrypt.hashSync(password, salt);
@@ -53,9 +74,12 @@ module.exports.forgetPassword = (email, password) => {
 
 module.exports.login = (email, password) => {
     return new Promise((resolve, reject) => {
+
+        console.log(" test 2"+ email)
         User.find({ email: email })
             .then(data => {
                 if (data !== null && data.length && data.length > 0) {
+                    console.log(" test 3"+ data[0].password)
                     if (bcrypt.compareSync(password, data[0].password)) {
                         let payload = {
                             email: data[0].email,
@@ -79,7 +103,7 @@ module.exports.login = (email, password) => {
                     reject("email n'existe pas");
                 }
             }).catch(err => {
-                console.log('test err ', err)
+                console.log("email n existe pas ", err)
                 reject(err);
             });
     });

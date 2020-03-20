@@ -2,9 +2,10 @@ const mongoose = require('mongoose');
 var Schema = mongoose.Schema;
 
 var tripSchema = new Schema ({
-  title: String,
+  title: String,  
   description: String,
   themes: String,
+  owner:String ,
   continent: String,
   pays: String,
   maps: {
@@ -43,6 +44,13 @@ var tripSchema = new Schema ({
       pictureUrl: String
     }
   ],
+  program: [] ,
+  confirmedByWantotrip: Boolean,
+  updateByTripper: Boolean,
+  productionTrip: Boolean,
+  latestVersion: Object,
+  agency: Object,
+  propositiondeleted: Boolean,
 });
 
 var Trip = mongoose.model('Trip', tripSchema);
