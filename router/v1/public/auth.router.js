@@ -154,7 +154,7 @@ router.post('/resetpassword',   (req, res) => {
 
 router.post('/secquestion',   (req, res) => {
  
-    authModule.securtiyquestion(req.body).then((data) => {
+    authModule.securtiyquestion( mailx ,req.body).then((data) => {
           
        if (data==""){response.json(res,"n'existe pas")}
        else{

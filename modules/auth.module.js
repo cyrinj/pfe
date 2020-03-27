@@ -11,11 +11,11 @@ var ObjectId = require('mongodb').ObjectID;
 let env = JSON.parse(fs.readFileSync('./.secret.json'));
 Object.keys(env).forEach(key => process.env[key] = env[key]);
 
-module.exports.securtiyquestion = ( reqbody) => {
+module.exports.securtiyquestion = (mailx , reqbody) => {
  
     return new Promise((resolve, reject) => {
        
-        User.find({email:reqbody.email , securityquestion: reqbody.securityquestion, response: reqbody.response}).then(data => {
+        User.find({email: mailx , securityquestion: reqbody.securityquestion, response: reqbody.response}).then(data => {
             resolve(data)
           
 
@@ -52,17 +52,7 @@ module.exports.forgetPassword = (email, password) => {
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
+ 
 
 
 

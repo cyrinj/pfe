@@ -10,16 +10,30 @@ var ObjectId = require('mongodb').ObjectID;
 
 
 
-module.exports. updatetrip = ( id ,x) => {
+module.exports. updatetrip = ( x) => {
     return new Promise((resolve, reject) => {
-         console.log("id :" +id)
-       trip.find({ '_id': id }).then(data => {
-             console.log("DATA :    "+data)
-            let tripp = data[0]
-            tripp.title="cvb"
-            console.log("/////////////////////////////////")
-            console.log("tripp id : " + tripp._id)
-         trip.findOneAndUpdate({ '_id': tripp._id }, tripp, { new: true }).then(dt => {
+      
+       trip.find({ '_id': x._id }).then(data => {
+           
+            let newtrp = data[0]
+           newtrp.title=x.title
+             newtrp.continent = x.continent
+                newtrp.country=x.country
+                newtrp.theme = x.theme
+                newtrp.duration=x.duration
+                newtrp.from = x.from
+                newtrp.to=x.to
+                newtrp.program=x.program
+                newtrp.inspiration = x.inspiration
+                newtrp.agencyname=x.agencyname
+                newtrp.agencyemail=x.agencyemail
+                newtrp.agencynumber = x.agencynumber
+                newtrp.price=x.price
+                newtrp.program=x.program
+
+
+
+         trip.findOneAndUpdate({ '_id': newtrp._id }, newtrp, { new: true }).then(dt => {
                 console.log("dt result " + dt)
                 resolve(dt)
             }) 
@@ -155,40 +169,58 @@ module.exports.alltripsbyuser = (id) => {
 
 
 
+const multer = require('multer');
 
+
+ 
+var storage = multer.diskStorage({
+  destination: function(req, file, cb) {
+    cb(null, 'rsc/uploads/');
+  },
+  filename: function(req, file, cb) {
+    cb(null,  file.originalname);
+  }
+});
+var upload= multer ({storage: storage}) 
 
 module.exports.subform = (tokenid ,x) => {
     return new Promise((resolve, reject) => {
          
     
         console.log('~######################################## test trip ~########################################\n')
+          trip1={}
+               trip1.title = x.title
+               trip1.owner=tokenid
           
-               trip.title = x.title
-               trip.owner=tokenid
- 
-               trip.continent = x.continent
-                trip.country=x.country
-                trip.theme = x.theme
-                trip.duration=x.duration
-                trip.from = x.from
-                trip.to=x.to
-                trip.program=x.program
-                trip.inspiration = x.inspiration
-                trip.agencyname=x.agencyname
-                trip.agencyemail=x.agencyemail
-                trip.agencynumber = x.agencynumber
-                trip.price=x.price
-                trip.confirmedByWantotrip=false
-                trip.propositiondeleted= false ; 
-                trip.program=x.program
-
+               trip1.continent = x.continent
+                trip1.country=x.country
+                trip1.theme = x.theme
+                trip1.duration=x.duration
+                trip1.from = x.from
+                trip1.to=x.to
+                trip1.program=x.program
+                trip1.inspiration = x.inspiration
+                trip1.agencyname=x.agencyname
+                trip1.agencyemail=x.agencyemail
+                trip1.agencynumber = x.agencynumber
+                trip1.price=x.price
+                trip1.confirmedByWantotrip=false
+                trip1.propositiondeleted= false ; 
+                trip1.program=x.program
                     
-                let newtrip = new trip (trip);
+                
+               let newtrip = new trip (trip1);
+               if ( newtrip.title==null) { reject("title required");}  
+               else {
                 newtrip.save(function(err,trip) {
                     if (err) {
                         reject(err);
                     } else {
-                        resolve(trip)
+                        
+
+
+
+                       
 
                     }
                 });
@@ -203,7 +235,7 @@ module.exports.subform = (tokenid ,x) => {
                 console.log(' add trip  err ', err)
                 reject(err);
             });
-        
+               }
 
 
 
@@ -240,14 +272,16 @@ module.exports.subform = (tokenid ,x) => {
 
 
 
-module.exports.editprofile = (token,x) => {
+module.exports.editprofile = (token,x,filename) => {
     return new Promise((resolve, reject) => {
         console.log("test edit profile token.id =  "+token.id)
         User.findByIdAndUpdate(token.id,   
             {
-                $set: { 
+                $set: {
+                    
+                    profilePictureUrl:"http://localhost:3000/uploads/"+token.id+"/"+filename, 
                     first_name: x.first_name,
-                        last_name: x. last_name,
+                       /* last_name: x. last_name,
                         username: x.  username,
                         email: x. email,
                         password: x.  password,
@@ -257,7 +291,7 @@ module.exports.editprofile = (token,x) => {
                         gouvernement: x.gouvernement,
                         pays: x. pays,
                         telephone: x. telephone,
-                        date_naissance: (x.date_naissance) 
+                        date_naissance: (x.date_naissance) */
                 } }, { new: true }).then(user => {
                 console.log("test edit profile !!! "+ user)
                 resolve(user)
